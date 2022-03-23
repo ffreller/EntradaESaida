@@ -2,9 +2,15 @@ from dbcomms import retrieve_data_from_dbprod, register_movimentacoes_realizadas
 from data_preparation import preprocess_hospital_data, preprocess_external_data
 from predict import create_predictions
 from defs import print_with_time
+from os import path as os_path, mkdir, makedirs
 
 
-if __name__ == '__main__':       
+
+if __name__ == '__main__':
+    if not os_path.exists('data'):
+        makedirs('data/raw')
+        mkdir('data/interim')
+        mkdir('data/final')
     retrieve_data_from_dbprod()
     preprocess_hospital_data()
     preprocess_external_data()

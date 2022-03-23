@@ -2,9 +2,8 @@ from math import isnan
 from pandas import to_datetime, Timedelta, DataFrame
 from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
 from json import dump as json_dump, load as json_load
-from seaborn import lineplot, scatterplot
+
 from os.path import exists
-import matplotlib.pyplot as plt
 from datetime import datetime
 from base64 import b64decode
 from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
@@ -22,6 +21,7 @@ def my_dateparser(date_str):
         return to_datetime(date_str, format='%d/%m/%Y %H:%M', errors='coerce')
     else:
         return to_datetime(date_str, format='%d/%m/%Y %H:%M:%S', errors='coerce')
+
     
 def depois_do_feriado(row):
     diadasemana = row['ds'].dayofweek
@@ -63,7 +63,7 @@ def print_timeseries_metrics(df, name_of_pred_column, register_results=False, mo
         assert modelo != '', 'O argumento modelo é obrigatório para registrar as métricas'
         assert outros != {}, 'O argumento modelo é obrigatório para registrar as métricas'
         results = {}
-        agora = (datetime.now() - Timedelta(hours=3)).strftime('%H:%M %d/%m/%y')
+        agora = datetime.now().strftime('%H:%M %d/%m/%y')
         results['hora'] = agora
         results['mape'] = this_mape
         results['mae'] = this_mae
@@ -87,51 +87,10 @@ def print_timeseries_metrics(df, name_of_pred_column, register_results=False, mo
         
         with open(fpath, "w") as outfile:
             json_dump(data, outfile)
-            
-            
-def plot_per_day(df, name):
-    plt.style.use('seaborn')
-    plt.figure(figsize=(30,10))
-    scatterplot(data=df, x='ds', y='y', alpha=.4, color="grey", label="valor diário")
-    lineplot(x=df['ds'], y=df['y'].rolling(30).mean(), label="Média movel: 1 mês")
-    lineplot(x=df['ds'], y=df['y'].rolling(7).mean(), label="Média movel: 1 semana", color='goldenrod')
-    # lineplot(x=df['ds'], y=df['y'].rolling(365).mean(), label="Média movel: 1 ano")
-    # lineplot(x=df_covid2['ds'], y=df_covid2['y'],label="Covid")
-    plt.title(name, fontdict={'fontsize':20})
-    plt.show()
     
-    
-def plot_compare_results(df, column1, column2):
-    plt.style.use('seaborn')
-    df_ = df[['ds', 'y', column1, column2]].copy()
-    df_[column1] = df_[column1].round(0).astype(int)
-    df_[column2] = df_[column2].round(0).astype(int)
-    fig_dims = (30,24)
-    fig_, ax = plt.subplots(3,1, figsize=fig_dims)
-    label1 = column1.split('_')[-1].capitalize()
-    label2 = column2.split('_')[-1].capitalize()
-    lineplot(x=df_['ds'], y=df_[column1], label=label1, ax=ax[0])
-    lineplot(x=df_['ds'], y=df_[column2], label=label2, ax=ax[0])
-    lineplot(x=df_['ds'], y=df_['y'], label="y", ax=ax[0])
-    
-    df_[f'abs_error_{label1}'] = abs(df_['y']-df_[column1])
-    df_[f'abs_error_{label2}'] = abs(df_['y']-df_[column2])
-    
-    lineplot(x=df_['ds'], y=df_[f'abs_error_{label1}'], label=f"ERROR - {label1}", ax=ax[1])
-    lineplot(x=df_['ds'], y=df_[f'abs_error_{label2}'], label=f"ERROR - {label2}", ax=ax[1])
-    
-    lineplot(x=df_['y'], y=df_[f'abs_error_{label1}'], label=f"ERROR - {label1}", ax=ax[2])
-    lineplot(x=df_['y'], y=df_[f'abs_error_{label2}'], label=f"ERROR - {label2}", ax=ax[2])
-    
-    ax[0].set_ylabel('qtd')
-    ax[1].set_ylabel('qtd')
-    ax[2].set_ylabel('qtd')
-    
-    plt.show()
-    
-    
+        
 def print_with_time(txt):
-    agora = datetime.now() - Timedelta(hours=3)
+    agora = datetime.now()
     print(f"{agora.strftime('%H:%M:%S')} - {txt}")
 
 

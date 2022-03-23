@@ -95,7 +95,7 @@ def register_movimentacoes_realizadas_dbteste():
     saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti.pickle')
     saida_ui = pd.read_pickle(interim_data_dir+'/saida_ui.pickle')
     
-    agora = (datetime.now() - pd.Timedelta(hours=3))
+    agora = datetime.now()
     for df_ in [entrada_uti, entrada_ui, saida_uti, saida_ui]:
         df_['cd_estabelecimento'] = 1
         df_['dt_carga'] = agora

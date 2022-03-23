@@ -31,7 +31,6 @@ def preprocess_hospital_data():
     df_entrada_ui = df_entrada_ui[['dia_entrada_unidade', 'nr_atendimento']].groupby('dia_entrada_unidade').count().reset_index()
     df_saida_ui = df_saida_ui[['dia_saida_unidade', 'nr_atendimento']].groupby('dia_saida_unidade').count().reset_index()
 
-    ontem = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=1)
     # Renomeando as colunas
     for df_1 in [df_entrada_uti, df_saida_uti, df_entrada_ui, df_saida_ui]:
         df_1.columns = ["ds", "y"]

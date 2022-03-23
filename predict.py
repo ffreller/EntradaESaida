@@ -46,7 +46,7 @@ def create_predictions():
         this_final = create_final_dataset(df1, tipo=tipo, setor=setor, ae90=ae90)
         final = final.append(this_final)
 
-    final['dt_carga'] = datetime.now() - pd.Timedelta(hours=3)
+    final['dt_carga'] = datetime.now()
     final = final[['cd_estabelecimento', 'dt_carga', 'tipo', 'ds_classific_setor', 'ds_especialidade', 'dt_previsao',
                 'hrr_previsao', 'qtd_previsao','qtd_previsao_min', 'qtd_previsao_max']].reset_index(drop=True)
     final.loc[final['qtd_previsao_min'] < 0, 'qtd_previsao_min'] = 0

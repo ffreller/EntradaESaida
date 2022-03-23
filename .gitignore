@@ -5,3 +5,4 @@ darts_logs/
 __pycache__/
 .ipynb_checkpoints/
 our_config.py
+log.txt
