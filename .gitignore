@@ -1,0 +1,7 @@
+data/
+instantclient_21_5/
+old/
+darts_logs/
+__pycache__/
+.ipynb_checkpoints/
+our_config.py

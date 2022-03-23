@@ -1,0 +1,225 @@
+from math import isnan
+from pandas import to_datetime, Timedelta, DataFrame
+from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
+from json import dump as json_dump, load as json_load
+from seaborn import lineplot, scatterplot
+from os.path import exists
+import matplotlib.pyplot as plt
+from datetime import datetime
+from base64 import b64decode
+from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
+from sqlalchemy import create_engine
+from numpy import sqrt, cbrt
+
+
+def my_dateparser(date_str):
+    if (type(date_str) == float):
+        if isnan(date_str):
+            return to_datetime('NaT')
+    if len(date_str) == 10:
+        return to_datetime(date_str, format='%d/%m/%Y', errors='coerce')
+    elif len(date_str) < 19:
+        return to_datetime(date_str, format='%d/%m/%Y %H:%M', errors='coerce')
+    else:
+        return to_datetime(date_str, format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    
+def depois_do_feriado(row):
+    diadasemana = row['ds'].dayofweek
+    if (diadasemana < 5) and (diadasemana != 2):
+        if diadasemana <= 1:
+            somar = 1
+        elif diadasemana == 3:
+            somar = 4
+        elif diadasemana == 4:
+            somar = 3
+        return row['ds'] + Timedelta(days=somar)
+    else:
+        return to_datetime("NaT")
+    
+    
+def print_timeseries_metrics(df, name_of_pred_column, register_results=False, modelo='', outros={}):
+    df_ = df[['y', name_of_pred_column]].copy()
+    df_[name_of_pred_column] = df_[name_of_pred_column].round(0).astype(int)
+    df_[f'abs_error_{name_of_pred_column}'] = abs(df_['y']-df_[name_of_pred_column])
+    df_[f'ape_{name_of_pred_column}'] = df_[f'abs_error_{name_of_pred_column}']/df_['y']
+    this_mape = mean_absolute_percentage_error(df_['y'], df_[name_of_pred_column])
+    this_mae = mean_absolute_error(df_['y'], df_[name_of_pred_column])
+    ape90 = df_[f'ape_{name_of_pred_column}'].quantile(0.9)
+    ape95 = df_[f'ape_{name_of_pred_column}'].quantile(0.95)
+    ae90 =  df_[f'abs_error_{name_of_pred_column}'].quantile(0.9)
+    ae95 =  df_[f'abs_error_{name_of_pred_column}'].quantile(0.95)
+    
+    print(f'Absolute percentage error - Percentil 90%: {ape90: .3%}')
+    print(f'Absolute percentage error - Percentil 95%: {ape95: .3%}')
+    print(f'Absolute error - Percentil 90%: {ae90: .3f}')
+    print(f'Absolute error - Percentil 95%: {ae95: .3f}')
+    
+    description = df_[[f'abs_error_{name_of_pred_column}',f'ape_{name_of_pred_column}']].describe()
+    print(f'Mape: {this_mape :.3%}')
+    print(f'Mae: {this_mae :.3f}')
+    print(description)
+    
+    if register_results:
+        assert modelo != '', 'O argumento modelo é obrigatório para registrar as métricas'
+        assert outros != {}, 'O argumento modelo é obrigatório para registrar as métricas'
+        results = {}
+        agora = (datetime.now() - Timedelta(hours=3)).strftime('%H:%M %d/%m/%y')
+        results['hora'] = agora
+        results['mape'] = this_mape
+        results['mae'] = this_mae
+        results['ape90'] = ape90
+        results['ape95'] = ape95
+        results['ae90'] = ae90
+        results['ae95'] = ae95
+        results['description'] = description.to_dict()
+        results['modelo'] = modelo
+        results['outros'] = outros
+        
+        fpath = f'results/{modelo}.json'
+        if exists(fpath):
+            with open(fpath) as file:
+                data = json_load(file)
+        else:
+            data = {}
+                
+        index = len(data)
+        data[index] = results
+        
+        with open(fpath, "w") as outfile:
+            json_dump(data, outfile)
+            
+            
+def plot_per_day(df, name):
+    plt.style.use('seaborn')
+    plt.figure(figsize=(30,10))
+    scatterplot(data=df, x='ds', y='y', alpha=.4, color="grey", label="valor diário")
+    lineplot(x=df['ds'], y=df['y'].rolling(30).mean(), label="Média movel: 1 mês")
+    lineplot(x=df['ds'], y=df['y'].rolling(7).mean(), label="Média movel: 1 semana", color='goldenrod')
+    # lineplot(x=df['ds'], y=df['y'].rolling(365).mean(), label="Média movel: 1 ano")
+    # lineplot(x=df_covid2['ds'], y=df_covid2['y'],label="Covid")
+    plt.title(name, fontdict={'fontsize':20})
+    plt.show()
+    
+    
+def plot_compare_results(df, column1, column2):
+    plt.style.use('seaborn')
+    df_ = df[['ds', 'y', column1, column2]].copy()
+    df_[column1] = df_[column1].round(0).astype(int)
+    df_[column2] = df_[column2].round(0).astype(int)
+    fig_dims = (30,24)
+    fig_, ax = plt.subplots(3,1, figsize=fig_dims)
+    label1 = column1.split('_')[-1].capitalize()
+    label2 = column2.split('_')[-1].capitalize()
+    lineplot(x=df_['ds'], y=df_[column1], label=label1, ax=ax[0])
+    lineplot(x=df_['ds'], y=df_[column2], label=label2, ax=ax[0])
+    lineplot(x=df_['ds'], y=df_['y'], label="y", ax=ax[0])
+    
+    df_[f'abs_error_{label1}'] = abs(df_['y']-df_[column1])
+    df_[f'abs_error_{label2}'] = abs(df_['y']-df_[column2])
+    
+    lineplot(x=df_['ds'], y=df_[f'abs_error_{label1}'], label=f"ERROR - {label1}", ax=ax[1])
+    lineplot(x=df_['ds'], y=df_[f'abs_error_{label2}'], label=f"ERROR - {label2}", ax=ax[1])
+    
+    lineplot(x=df_['y'], y=df_[f'abs_error_{label1}'], label=f"ERROR - {label1}", ax=ax[2])
+    lineplot(x=df_['y'], y=df_[f'abs_error_{label2}'], label=f"ERROR - {label2}", ax=ax[2])
+    
+    ax[0].set_ylabel('qtd')
+    ax[1].set_ylabel('qtd')
+    ax[2].set_ylabel('qtd')
+    
+    plt.show()
+    
+    
+def print_with_time(txt):
+    agora = datetime.now() - Timedelta(hours=3)
+    print(f"{agora.strftime('%H:%M:%S')} - {txt}")
+
+
+def create_db_conn(test_prod):
+    if test_prod.lower() == 'prod':
+        usuario = b64decode(usuario_prod).decode("utf-8")
+        senha = b64decode(senha_prod).decode("utf-8")
+        vDB_TNS = "DBPROD"
+    elif test_prod.lower() == 'test':
+        usuario = b64decode(usuario_teste).decode("utf-8")
+        senha = b64decode(senha_teste).decode("utf-8")
+        vDB_TNS = "DBTESTE1"
+    else:
+        print("O argumento test_prod precisa ser igual a 'test' ou a 'prod'")
+        return None
+    conn = create_engine(f'oracle+cx_oracle://{usuario}:{senha}@{vDB_TNS}')
+    return conn
+
+
+def get_best_args_for_model(model_name, holidays, covariates_series):
+    results_fname = model_name.capitalize().replace('_u', 'U')
+    fpath = f'results/{results_fname}.json'
+    with open(fpath) as file:
+        results = json_load(file)
+    results = DataFrame(results).T.sort_values(['mae', 'mape'])
+    configs, i = {}, 0
+    while 'melhor_coluna' not in list(configs.keys()):
+        configs = results.iloc[i]['outros']
+        i += 1
+    ae90 = results.iloc[i-1]['ae90']
+    country_holidays = holidays if configs['holidays'] is True else None
+    future_covariates = covariates_series[configs['future_covariates']] if configs['future_covariates'] is not None else None
+    addSegunda, addTerca, subSabado, subDomingo, addAfterHolidays, subFimAno, melhor_coluna = \
+        configs['addSegunda'], configs['addTerca'], configs['subSabado'], configs['subDomingo'], configs['addAfterHolidays'], configs['subFimAno'], configs['melhor_coluna']
+    return country_holidays, future_covariates, addSegunda, addTerca, subSabado, subDomingo, addAfterHolidays, subFimAno, melhor_coluna, ae90
+
+
+def get_ensemble_predicitions_from_column_name(column_name, col_es, col_pr):
+    method = [int(s) for s in column_name if s.isdigit()][0]
+    if method == 1:
+        ensemble = (col_pr + col_es)/2
+    elif method == 2:
+        ensemble = (col_pr + col_es*2)/3
+    elif method == 3:
+        ensemble = (col_pr + col_es*3)/4
+    elif method == 4:
+        ensemble = (col_pr + col_es*4)/5
+    elif method == 5:
+        ensemble = sqrt(col_pr * col_es)
+    elif method == 6:
+        ensemble = cbrt(col_pr * (col_es**2))
+    elif method == 7:
+        ensemble = cbrt((col_pr**2) * col_es)
+    elif method == 8:
+        ensemble = (col_pr*2 + col_es)/3
+    elif method == 9:
+        ensemble = (col_pr*3 + col_es)/4
+    elif method == 10:
+        ensemble = (col_pr*4 + col_es)/5
+    else:
+        print('Problema ao criar coluna ensemble')
+        return None
+    return ensemble
+
+
+def custom_add_and_subtract(df__, addSegunda, addTerca, subSabado, subDomingo, addAfterHolidays, subFimAno):
+    df_ = df__.copy()
+    df_['weekday'] = df_['ds'].dt.dayofweek
+    df_.loc[df_['weekday'] == 0,f'ensemble_preds'] = df_.loc[df_['weekday'] == 0,f'ensemble_preds'] + addSegunda
+    df_.loc[df_['weekday'] == 1,f'ensemble_preds'] = df_.loc[df_['weekday'] == 1,f'ensemble_preds'] + addTerca
+    df_.loc[df_['after_holidays'] == 1,f'ensemble_preds'] = df_.loc[df_['after_holidays'] == 1, f'ensemble_preds'] + addAfterHolidays
+    df_.loc[df_['weekday'] == 5,f'ensemble_preds'] = df_.loc[df_['weekday'] == 5,f'ensemble_preds'] - subSabado
+    df_.loc[df_['weekday'] == 6,f'ensemble_preds'] = df_.loc[df_['weekday'] == 6,f'ensemble_preds'] - subDomingo
+    df_.loc[df_['fim_ano'] == 1,f'ensemble_preds'] = df_.loc[df_['fim_ano'] == 1, f'ensemble_preds'] - subFimAno
+    df_['ensemble_preds'] = df_['ensemble_preds']
+    return df_
+
+
+def create_final_dataset(df_preds, tipo, setor, ae90, especialidade='-'):
+    df_ = df_preds.rename(columns={'ds':"dt_previsao", 'ensemble_preds':'qtd_previsao'}).copy()
+    df_['cd_estabelecimento'] = 1
+    df_['tipo'] = tipo.capitalize()
+    df_['ds_classific_setor'] = setor.upper()
+    df_['ds_especialidade'] = especialidade
+    df_['hrr_previsao'] = '-'
+    df_['qtd_previsao_min'] = df_['qtd_previsao'] - ae90
+    df_['qtd_previsao_max'] = df_['qtd_previsao'] + ae90
+    for col in ['qtd_previsao', 'qtd_previsao_min', 'qtd_previsao_max']:
+        df_[col] = df_[col].round(0).astype(int)
+    return df_
+    

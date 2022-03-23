@@ -1,0 +1,550 @@
+{
+  "0": {
+    "hora": "18:15 08/03/22",
+    "mape": 0.1509579758085378,
+    "mae": 8.46171693735499,
+    "ape90": 0.28,
+    "ape95": 0.36069311445508434,
+    "ae90": 18,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble5_weekday": {
+        "count": 431,
+        "mean": 8.46171693735499,
+        "std": 6.730547911188618,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 39
+      },
+      "ape_ensemble5_weekday": {
+        "count": 431,
+        "mean": 0.1509579758085378,
+        "std": 0.20684926561894718,
+        "min": 0,
+        "25%": 0.05263157894736842,
+        "50%": 0.11428571428571428,
+        "75%": 0.1890764647467726,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "1": {
+    "hora": "11:20 09/03/22",
+    "mape": 0.14999258821155165,
+    "mae": 8.4375,
+    "ape90": 0.2787489975942262,
+    "ape95": 0.3477930707166587,
+    "ae90": 18,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble5_weekday": {
+        "count": 432,
+        "mean": 8.4375,
+        "std": 6.716726446203705,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 39
+      },
+      "ape_ensemble5_weekday": {
+        "count": 432,
+        "mean": 0.14999258821155165,
+        "std": 0.2060041775295259,
+        "min": 0,
+        "25%": 0.05263157894736842,
+        "50%": 0.11396103896103896,
+        "75%": 0.1877948113207547,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "2": {
+    "hora": "11:32 09/03/22",
+    "mape": 0.14999258821155165,
+    "mae": 8.4375,
+    "ape90": 0.2787489975942262,
+    "ape95": 0.3477930707166587,
+    "ae90": 18,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble5_weekday": {
+        "count": 432,
+        "mean": 8.4375,
+        "std": 6.716726446203705,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 39
+      },
+      "ape_ensemble5_weekday": {
+        "count": 432,
+        "mean": 0.14999258821155165,
+        "std": 0.2060041775295259,
+        "min": 0,
+        "25%": 0.05263157894736842,
+        "50%": 0.11396103896103896,
+        "75%": 0.1877948113207547,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "3": {
+    "hora": "12:19 09/03/22",
+    "mape": 0.15587044852428916,
+    "mae": 8.55324074074074,
+    "ape90": 0.2929473684210528,
+    "ape95": 0.3900165357585779,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.55324074074074,
+        "std": 7.028740379995581,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 42
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15587044852428916,
+        "std": 0.22660339616448424,
+        "min": 0,
+        "25%": 0.05263157894736842,
+        "50%": 0.1111111111111111,
+        "75%": 0.1930322966507177,
+        "max": 2.625
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "4": {
+    "hora": "12:55 09/03/22",
+    "mape": 0.1524012528509474,
+    "mae": 8.409722222222221,
+    "ape90": 0.28547619047619055,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.409722222222221,
+        "std": 6.649054704312752,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 39
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.1524012528509474,
+        "std": 0.20940013979320488,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.11257406188281764,
+        "75%": 0.1901865847897969,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "5": {
+    "hora": "13:01 09/03/22",
+    "mape": 0.15244466673545973,
+    "mae": 8.405092592592593,
+    "ape90": 0.2818461538461539,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.405092592592593,
+        "std": 6.652478699344706,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 40
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15244466673545973,
+        "std": 0.21214494194681421,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.1111111111111111,
+        "75%": 0.1857638888888889,
+        "max": 2.5
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "6": {
+    "hora": "13:31 09/03/22",
+    "mape": 0.15244466673545973,
+    "mae": 8.405092592592593,
+    "ape90": 0.2818461538461539,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.405092592592593,
+        "std": 6.652478699344706,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 40
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15244466673545973,
+        "std": 0.21214494194681421,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.1111111111111111,
+        "75%": 0.1857638888888889,
+        "max": 2.5
+      }
+    },
+    "modelo": "SaidaUi"
+  },
+  "7": {
+    "hora": "15:03 09/03/22",
+    "mape": 0.15244466673545973,
+    "mae": 8.405092592592593,
+    "ape90": 0.2818461538461539,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.405092592592593,
+        "std": 6.652478699344706,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 40
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15244466673545973,
+        "std": 0.21214494194681421,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.1111111111111111,
+        "75%": 0.1857638888888889,
+        "max": 2.5
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 1,
+      "subSabado": 3,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0
+    }
+  },
+  "8": {
+    "hora": "15:06 09/03/22",
+    "mape": 0.15147596812191774,
+    "mae": 8.405092592592593,
+    "ape90": 0.28,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.405092592592593,
+        "std": 6.6639781734197685,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12.25,
+        "max": 39
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15147596812191774,
+        "std": 0.20825781708962812,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.1111111111111111,
+        "75%": 0.1879222972972973,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 0,
+      "subSabado": 4,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0
+    }
+  },
+  "9": {
+    "hora": "15:30 09/03/22",
+    "mape": 0.15296327829959178,
+    "mae": 8.476851851851851,
+    "ape90": 0.2832051282051282,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.476851851851851,
+        "std": 6.741458206030981,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 38
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15296327829959178,
+        "std": 0.20814059924266345,
+        "min": 0,
+        "25%": 0.05079382106844025,
+        "50%": 0.11326979472140762,
+        "75%": 0.1836734693877551,
+        "max": 2.375
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": null,
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 1,
+      "subSabado": 4,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble1_weekday"
+    }
+  },
+  "10": {
+    "hora": "15:46 09/03/22",
+    "mape": 0.15190646028067128,
+    "mae": 8.405092592592593,
+    "ape90": 0.2818461538461539,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.405092592592593,
+        "std": 6.648641121440406,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 39
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15190646028067128,
+        "std": 0.20875338135203825,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.1116780045351474,
+        "75%": 0.18930568499534017,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": false,
+      "addSegunda": 0,
+      "addTerca": 1,
+      "subSabado": 4,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble1_weekday"
+    }
+  },
+  "11": {
+    "hora": "15:59 09/03/22",
+    "mape": 0.15448816582176766,
+    "mae": 8.467592592592593,
+    "ape90": 0.2818461538461539,
+    "ape95": 0.39613754889178604,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.467592592592593,
+        "std": 6.859806991713724,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 42
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15448816582176766,
+        "std": 0.22459472225489757,
+        "min": 0,
+        "25%": 0.05063559322033899,
+        "50%": 0.1111111111111111,
+        "75%": 0.18983709737134397,
+        "max": 2.625
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": false,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 1,
+      "subSabado": 4,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble1_weekday"
+    }
+  },
+  "12": {
+    "hora": "16:01 09/03/22",
+    "mape": 0.15405767366301412,
+    "mae": 8.467592592592593,
+    "ape90": 0.28,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.467592592592593,
+        "std": 6.870959482790197,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12,
+        "max": 42
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15405767366301412,
+        "std": 0.22408639586978157,
+        "min": 0,
+        "25%": 0.05018378599142333,
+        "50%": 0.1111111111111111,
+        "75%": 0.18983709737134397,
+        "max": 2.625
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": false,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 0,
+      "subSabado": 4,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble1_weekday"
+    }
+  },
+  "13": {
+    "hora": "16:16 09/03/22",
+    "mape": 0.15147596812191774,
+    "mae": 8.405092592592593,
+    "ape90": 0.28,
+    "ape95": 0.38931261770244824,
+    "ae90": 17,
+    "ae95": 21,
+    "description": {
+      "abs_error_ensemble1_weekday": {
+        "count": 432,
+        "mean": 8.405092592592593,
+        "std": 6.6639781734197685,
+        "min": 0,
+        "25%": 3,
+        "50%": 7,
+        "75%": 12.25,
+        "max": 39
+      },
+      "ape_ensemble1_weekday": {
+        "count": 432,
+        "mean": 0.15147596812191774,
+        "std": 0.20825781708962812,
+        "min": 0,
+        "25%": 0.04804934021801492,
+        "50%": 0.1111111111111111,
+        "75%": 0.1879222972972973,
+        "max": 2.4375
+      }
+    },
+    "modelo": "SaidaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 0,
+      "subSabado": 4,
+      "subDomingo": 4,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble1_weekday"
+    }
+  }
+}

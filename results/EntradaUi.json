@@ -1,0 +1,187 @@
+{
+  "0": {
+    "hora": "17:03 10/03/22",
+    "mape": 0.14450067929014956,
+    "mae": 4.923611111111111,
+    "ape90": 0.30272727272727284,
+    "ape95": 0.41379310344827586,
+    "ae90": 10.900000000000034,
+    "ae95": 12,
+    "description": {
+      "abs_error_ensemble2_weekday": {
+        "count": 432,
+        "mean": 4.923611111111111,
+        "std": 3.832477879597282,
+        "min": 0,
+        "25%": 2,
+        "50%": 4,
+        "75%": 7,
+        "max": 16
+      },
+      "ape_ensemble2_weekday": {
+        "count": 432,
+        "mean": 0.14450067929014956,
+        "std": 0.13442288550145776,
+        "min": 0,
+        "25%": 0.05229419703103913,
+        "50%": 0.10990338164251207,
+        "75%": 0.2,
+        "max": 0.8235294117647058
+      }
+    },
+    "modelo": "EntradaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 0,
+      "subSabado": 1,
+      "subDomingo": 0,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble2_weekday"
+    }
+  },
+  "1": {
+    "hora": "17:19 10/03/22",
+    "mape": 0.14476479073447227,
+    "mae": 4.925925925925926,
+    "ape90": 0.3,
+    "ape95": 0.41379310344827586,
+    "ae90": 10.900000000000034,
+    "ae95": 12,
+    "description": {
+      "abs_error_ensemble4": {
+        "count": 432,
+        "mean": 4.925925925925926,
+        "std": 3.8839396931136716,
+        "min": 0,
+        "25%": 2,
+        "50%": 4,
+        "75%": 7.25,
+        "max": 17
+      },
+      "ape_ensemble4": {
+        "count": 432,
+        "mean": 0.14476479073447227,
+        "std": 0.13758431847419422,
+        "min": 0,
+        "25%": 0.05229419703103913,
+        "50%": 0.1111111111111111,
+        "75%": 0.20419758812615957,
+        "max": 0.8823529411764706
+      }
+    },
+    "modelo": "EntradaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": null,
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 0,
+      "subSabado": 1,
+      "subDomingo": 0,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble4"
+    }
+  },
+  "2": {
+    "hora": "17:41 10/03/22",
+    "mape": 0.14450067929014956,
+    "mae": 4.923611111111111,
+    "ape90": 0.30272727272727284,
+    "ape95": 0.41379310344827586,
+    "ae90": 10.900000000000034,
+    "ae95": 12,
+    "description": {
+      "abs_error_ensemble2_weekday": {
+        "count": 432,
+        "mean": 4.923611111111111,
+        "std": 3.832477879597282,
+        "min": 0,
+        "25%": 2,
+        "50%": 4,
+        "75%": 7,
+        "max": 16
+      },
+      "ape_ensemble2_weekday": {
+        "count": 432,
+        "mean": 0.14450067929014956,
+        "std": 0.13442288550145776,
+        "min": 0,
+        "25%": 0.05229419703103913,
+        "50%": 0.10990338164251207,
+        "75%": 0.2,
+        "max": 0.8235294117647058
+      }
+    },
+    "modelo": "EntradaUi",
+    "outros": {
+      "holidays": true,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": false,
+      "addSegunda": 0,
+      "addTerca": 0,
+      "subSabado": 1,
+      "subDomingo": 0,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "ensemble2_weekday"
+    }
+  },
+  "3": {
+    "hora": "17:57 10/03/22",
+    "mape": 0.1451783792120354,
+    "mae": 4.951388888888889,
+    "ape90": 0.3149797570850205,
+    "ape95": 0.4112068965517241,
+    "ae90": 10,
+    "ae95": 12,
+    "description": {
+      "abs_error_y_pred_ExponentialSmoothing_weekday": {
+        "count": 432,
+        "mean": 4.951388888888889,
+        "std": 3.8912058523426247,
+        "min": 0,
+        "25%": 2,
+        "50%": 4,
+        "75%": 7,
+        "max": 18
+      },
+      "ape_y_pred_ExponentialSmoothing_weekday": {
+        "count": 432,
+        "mean": 0.1451783792120354,
+        "std": 0.1370679152662379,
+        "min": 0,
+        "25%": 0.04878048780487805,
+        "50%": 0.11237373737373738,
+        "75%": 0.2,
+        "max": 0.9
+      }
+    },
+    "modelo": "EntradaUi",
+    "outros": {
+      "holidays": false,
+      "future_covariates": [
+        "after_holidays",
+        "fim_ano"
+      ],
+      "past_covariates": true,
+      "addSegunda": 0,
+      "addTerca": 1,
+      "subSabado": 0,
+      "subDomingo": 0,
+      "addAfterHolidays": 0,
+      "subFimAno": 0,
+      "melhor_coluna": "y_pred_ExponentialSmoothing_weekday"
+    }
+  }
+}
