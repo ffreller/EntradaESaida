@@ -1,13 +1,12 @@
 import pandas as pd
 from datetime import datetime
-from defs import depois_do_feriado, print_with_time
+from defs import depois_do_feriado, print_with_time, raw_data_dir, interim_data_dir
 from tqdm import tqdm
 
-interim_data_dir = 'data/interim'
 
 def preprocess_hospital_data():
     ontem = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=1)
-    df0 = pd.read_pickle('data/raw/query_result.pickle')
+    df0 = pd.read_pickle(raw_data_dir+'/query_result.pickle')
 
     # Criando coluna para dia
     df0['dia_entrada_unidade'] = pd.to_datetime(df0['dt_entrada_unidade'].dt.date)
@@ -76,7 +75,7 @@ def preprocess_external_data():
         df_to_holidays = df_to_holidays.append({'ds':dia, 'y':0}, ignore_index=True)
     
     dateparse = lambda dates: [datetime.strptime(d, '%Y-%m-%d') for d in dates]
-    holidays = pd.read_csv('data/raw/holidays.csv', parse_dates=['0'], date_parser=dateparse)
+    holidays = pd.read_csv(raw_data_dir+'/holidays.csv', parse_dates=['0'], date_parser=dateparse)
     holidays.columns = ['ds']
 
     after_holidays = holidays.copy()

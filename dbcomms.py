@@ -1,4 +1,4 @@
-from defs import print_with_time, create_db_conn
+from defs import print_with_time, create_db_conn, raw_data_dir, interim_data_dir, final_data_dir
 from sqlalchemy import types as sqlalchemy_types
 from sqlalchemy.sql import text as sqlalchemy_text
 import pandas as pd
@@ -11,7 +11,7 @@ sqlalchemy_dtypes = {'tipo':sqlalchemy_types.VARCHAR(100),
                      'ds_tipo_atendimento':sqlalchemy_types.VARCHAR(100),
                      'ds_carater_internacao':sqlalchemy_types.VARCHAR(100),
                      'hrr_realizado': sqlalchemy_types.VARCHAR(100)}
-   
+
     
 def retrieve_data_from_dbprod():
     conn = create_db_conn('odi')
@@ -82,14 +82,13 @@ def retrieve_data_from_dbprod():
     except Exception as e:
         print('Erro ao baixar dados:', e)
         return False
-    assert len(df) > 0, f'Erro ao baixar dados do DBPROD'
+    assert len(df) > 0, print(f'Erro ao baixar dados do DBPROD')
     print_with_time(f'Dados do DB_ODI_PROD baixados')
-    df.to_pickle('data/raw/query_result.pickle')
+    df.to_pickle(raw_data_dir+'/query_result.pickle')
     return df
 
 
 def register_movimentacoes_realizadas_dbteste():
-    interim_data_dir = 'data/interim'
     entrada_uti = pd.read_pickle(interim_data_dir+'/entrada_uti.pickle') 
     entrada_ui = pd.read_pickle(interim_data_dir+'/entrada_ui.pickle')
     saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti.pickle')
@@ -122,22 +121,21 @@ def register_movimentacoes_realizadas_dbteste():
     
 
 def register_predictions_dbteste():
-    df0 = pd.read_pickle('data/final/previsoes.pickle')
+    df0 = pd.read_pickle(final_data_dir+'previsoes.pickle')
     this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
     colunas_enviadas = list(this_types.keys())
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
                       'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'int64',
                       'qtd_previsao_min': 'int64', 'qtd_previsao_max': 'int64'}
     for coluna in correct_types.keys():
-        assert coluna in colunas_enviadas, f"A coluna '{coluna}' precisa ser enviada para registro no BD"
-        assert this_types[coluna] == correct_types[coluna], f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}"
+        assert coluna in colunas_enviadas, print(f"A coluna '{coluna}' precisa ser enviada para registro no BD")
+        assert this_types[coluna] == correct_types[coluna], print(f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}")
     conn = create_db_conn('test')
     df0.to_sql(name='gl_stg_prev_movimentacao', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
     print_with_time(f"Predições registradas no DBTESTE1")
     
 
 def register_movimentacoes_realizadas_dbprod():
-    interim_data_dir = 'data/interim'
     entrada_uti = pd.read_pickle(interim_data_dir+'/entrada_uti.pickle') 
     entrada_ui = pd.read_pickle(interim_data_dir+'/entrada_ui.pickle')
     saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti.pickle')
@@ -170,15 +168,15 @@ def register_movimentacoes_realizadas_dbprod():
     
 
 def register_predictions_dbprod():
-    df0 = pd.read_pickle('data/final/previsoes.pickle')
+    df0 = pd.read_pickle(final_data_dir+'previsoes.pickle')
     this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
     colunas_enviadas = list(this_types.keys())
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
                       'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'int64',
                       'qtd_previsao_min': 'int64', 'qtd_previsao_max': 'int64'}
     for coluna in correct_types.keys():
-        assert coluna in colunas_enviadas, f"A coluna '{coluna}' precisa ser enviada para registro no BD"
-        assert this_types[coluna] == correct_types[coluna], f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}"
+        assert coluna in colunas_enviadas, print(f"A coluna '{coluna}' precisa ser enviada para registro no BD")
+        assert this_types[coluna] == correct_types[coluna], print(f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}")
     conn = create_db_conn('prod')
     df0.to_sql(name='gl_stg_prev_movimentacao', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
     print_with_time(f"Predições registradas no HAOC_TASY_PROD")

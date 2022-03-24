@@ -1,4 +1,3 @@
-from os.path import exists
 from math import isnan
 from datetime import datetime
 from base64 import b64decode
@@ -8,7 +7,13 @@ from pandas import to_datetime, Timedelta, DataFrame
 from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
 from sqlalchemy import create_engine
 from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
+from os import path as os_path
 
+this_dir = os_path.dirname(os_path.realpath(__file__))
+raw_data_dir = os_path.join(this_dir, 'data/raw')
+interim_data_dir = os_path.join(this_dir,'data/interim')
+final_data_dir = os_path.join(this_dir,'data/final')
+results_dir = os_path.join(this_dir,'results')
 
 def my_dateparser(date_str):
     if (type(date_str) == float):
@@ -74,8 +79,8 @@ def print_timeseries_metrics(df, name_of_pred_column, register_results=False, mo
         results['modelo'] = modelo
         results['outros'] = outros
         
-        fpath = f'results/{modelo}.json'
-        if exists(fpath):
+        fpath = results_dir+f'/{modelo}.json'
+        if os_path.exists(fpath):
             with open(fpath) as file:
                 data = json_load(file)
         else:
@@ -115,7 +120,7 @@ def create_db_conn(bd_tns):
 
 def get_best_args_for_model(model_name, holidays, covariates_series):
     results_fname = model_name.capitalize().replace('_u', 'U')
-    fpath = f'results/{results_fname}.json'
+    fpath = results_dir+f'/{results_fname}.json'
     with open(fpath) as file:
         results = json_load(file)
     results = DataFrame(results).T.sort_values(['mae', 'mape'])

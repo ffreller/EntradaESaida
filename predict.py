@@ -2,13 +2,13 @@ import pandas as pd
 from datetime import datetime
 from darts import TimeSeries
 from darts.models import ExponentialSmoothing, Prophet
-from defs import get_best_args_for_model, get_ensemble_predicitions_from_column_name, custom_add_and_subtract, create_final_dataset, print_with_time
+from defs import get_best_args_for_model, get_ensemble_predicitions_from_column_name, custom_add_and_subtract, create_final_dataset, print_with_time, interim_data_dir, final_data_dir
 
 
 def create_predictions():
-    fim_ano = pd.read_pickle('data/interim/fim_ano.pickle')
-    after_holidays = pd.read_pickle('data/interim/after_holidays.pickle')
-    holidays = pd.read_pickle('data/interim/holidays.pickle')
+    fim_ano = pd.read_pickle(interim_data_dir+'/fim_ano.pickle')
+    after_holidays = pd.read_pickle(interim_data_dir+'/after_holidays.pickle')
+    holidays = pd.read_pickle(interim_data_dir+'/holidays.pickle')
     covariates = after_holidays.merge(fim_ano, on='ds')
 
     all_models = ['entrada_ui', 'entrada_uti', 'saida_ui', 'saida_uti']
@@ -17,7 +17,7 @@ def create_predictions():
         print_with_time(f'Gerando predições: {model}')
         #Loading data
         tipo, setor = model.split('_')
-        df0 = pd.read_pickle(f'data/interim/{model}.pickle')
+        df0 = pd.read_pickle(interim_data_dir+f'/{model}.pickle')
         series = TimeSeries.from_dataframe(df0, 'ds', 'y')
         covariates_series = TimeSeries.from_dataframe(covariates, 'ds', ['after_holidays', 'fim_ano'])
         #Exponential Smoothing
@@ -50,11 +50,11 @@ def create_predictions():
                 'hrr_previsao', 'qtd_previsao','qtd_previsao_min', 'qtd_previsao_max']].reset_index(drop=True)
     final.loc[final['qtd_previsao_min'] < 0, 'qtd_previsao_min'] = 0
 
-    final.to_pickle('data/final/todas_previsoes.pickle')
+    final.to_pickle(final_data_dir+'todas_previsoes.pickle')
     
-    todas_preds = pd.read_pickle('data/final/todas_previsoes.pickle')
+    todas_preds = pd.read_pickle(final_data_dir+'/todas_previsoes.pickle')
     todas_preds = todas_preds.append(final)
-    todas_preds.to_pickle('data/final/todas_previsoes.pickle')
+    todas_preds.to_pickle(final_data_dir+'/todas_previsoes.pickle')
     
     print_with_time('Previsões criadas com sucesso')
     
