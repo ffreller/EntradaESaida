@@ -1,14 +1,13 @@
-from math import isnan
-from pandas import to_datetime, Timedelta, DataFrame
-from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
-from json import dump as json_dump, load as json_load
-
 from os.path import exists
+from math import isnan
 from datetime import datetime
 from base64 import b64decode
-from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
-from sqlalchemy import create_engine
+from json import dump as json_dump, load as json_load
 from numpy import sqrt, cbrt
+from pandas import to_datetime, Timedelta, DataFrame
+from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
+from sqlalchemy import create_engine
+from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
 
 
 def my_dateparser(date_str):
@@ -60,8 +59,8 @@ def print_timeseries_metrics(df, name_of_pred_column, register_results=False, mo
     print(description)
     
     if register_results:
-        assert modelo != '', 'O argumento modelo é obrigatório para registrar as métricas'
-        assert outros != {}, 'O argumento modelo é obrigatório para registrar as métricas'
+        assert modelo != '', print('O argumento modelo é obrigatório para registrar as métricas')
+        assert outros != {}, print('O argumento modelo é obrigatório para registrar as métricas')
         results = {}
         agora = datetime.now().strftime('%H:%M %d/%m/%y')
         results['hora'] = agora
@@ -94,17 +93,21 @@ def print_with_time(txt):
     print(f"{agora.strftime('%H:%M:%S')} - {txt}")
 
 
-def create_db_conn(test_prod):
-    if test_prod.lower() == 'prod':
+def create_db_conn(bd_tns):
+    if bd_tns.lower() == 'odi':
         usuario = b64decode(usuario_prod).decode("utf-8")
         senha = b64decode(senha_prod).decode("utf-8")
-        vDB_TNS = "DBPROD"
-    elif test_prod.lower() == 'test':
+        vDB_TNS = "DB_ODI_PROD"
+    elif bd_tns.lower() == 'test':
         usuario = b64decode(usuario_teste).decode("utf-8")
         senha = b64decode(senha_teste).decode("utf-8")
         vDB_TNS = "DBTESTE1"
+    elif bd_tns.lower() == 'prod':
+        usuario = b64decode(usuario_teste).decode("utf-8")
+        senha = b64decode(senha_teste).decode("utf-8")
+        vDB_TNS = "HAOC_TASY_PROD"
     else:
-        print("O argumento test_prod precisa ser igual a 'test' ou a 'prod'")
+        print("O argumento test_prod precisa ser igual a 'test', 'prod' ou 'odi'")
         return None
     conn = create_engine(f'oracle+cx_oracle://{usuario}:{senha}@{vDB_TNS}')
     return conn

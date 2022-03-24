@@ -1,5 +1,0 @@
-conda create -n DartsTimeSeries python=3.7 -y
-conda activate DartsTimeSeries
-pip install -r requirements.txt
-pip install "u8darts[prophet]"
-python main.py >> log.txt

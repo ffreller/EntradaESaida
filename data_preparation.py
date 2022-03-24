@@ -6,12 +6,16 @@ from tqdm import tqdm
 interim_data_dir = 'data/interim'
 
 def preprocess_hospital_data():
+    ontem = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=1)
     df0 = pd.read_pickle('data/raw/query_result.pickle')
 
     # Criando coluna para dia
     df0['dia_entrada_unidade'] = pd.to_datetime(df0['dt_entrada_unidade'].dt.date)
     df0['dia_saida_unidade'] = pd.to_datetime(df0['dt_saida_unidade'].dt.date)
 
+    assert df0['dia_entrada_unidade'].max() == ontem, print(f"Erro: não há entradas registradas no dia de ontem ({ontem.strftime('%d/%m/%Y')})")
+    assert df0['dia_saida_unidade'].max() == ontem, print(f"Erro: não há saídas registradas no dia de ontem ({ontem.strftime('%d/%m/%Y')})")
+    
     # Tirando pacientes eletivos
     df_ = df0.reset_index().copy()
     first = df_.sort_values('dt_entrada_unidade').groupby('nr_atendimento').first().reset_index()
@@ -36,7 +40,7 @@ def preprocess_hospital_data():
         df_1.columns = ["ds", "y"]
     
     # Filtrando o dataset para que tenha valores até o dia anterior
-    ontem = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=1)
+    
     df_entrada_uti = df_entrada_uti[df_entrada_uti['ds'] <= ontem]
     df_entrada_ui = df_entrada_ui[df_entrada_ui['ds'] <= ontem]
     df_saida_uti = df_saida_uti[df_saida_uti['ds'] <= ontem]

@@ -20,7 +20,6 @@ def create_predictions():
         df0 = pd.read_pickle(f'data/interim/{model}.pickle')
         series = TimeSeries.from_dataframe(df0, 'ds', 'y')
         covariates_series = TimeSeries.from_dataframe(covariates, 'ds', ['after_holidays', 'fim_ano'])
-        
         #Exponential Smoothing
         model_es = ExponentialSmoothing(random_state=42)
         model_es.fit(series)
@@ -51,7 +50,12 @@ def create_predictions():
                 'hrr_previsao', 'qtd_previsao','qtd_previsao_min', 'qtd_previsao_max']].reset_index(drop=True)
     final.loc[final['qtd_previsao_min'] < 0, 'qtd_previsao_min'] = 0
 
-    final.to_pickle('data/final/previsoes.pickle')
+    final.to_pickle('data/final/todas_previsoes.pickle')
+    
+    todas_preds = pd.read_pickle('data/final/todas_previsoes.pickle')
+    todas_preds = todas_preds.append(final)
+    todas_preds.to_pickle('data/final/todas_previsoes.pickle')
+    
     print_with_time('Previsões criadas com sucesso')
     
 
