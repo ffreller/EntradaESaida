@@ -85,7 +85,6 @@ def retrieve_data_from_dbprod():
     assert len(df) > 0, print(f'Erro ao baixar dados do DBPROD')
     print_with_time(f'Dados do DB_ODI_PROD baixados')
     df.to_pickle(raw_data_dir+'/query_result.pickle')
-    return df
 
 
 def register_movimentacoes_realizadas_dbteste():
@@ -121,7 +120,7 @@ def register_movimentacoes_realizadas_dbteste():
     
 
 def register_predictions_dbteste():
-    df0 = pd.read_pickle(final_data_dir+'previsoes.pickle')
+    df0 = pd.read_pickle(final_data_dir+'/previsoes.pickle')
     this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
     colunas_enviadas = list(this_types.keys())
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
@@ -168,7 +167,7 @@ def register_movimentacoes_realizadas_dbprod():
     
 
 def register_predictions_dbprod():
-    df0 = pd.read_pickle(final_data_dir+'previsoes.pickle')
+    df0 = pd.read_pickle(final_data_dir+'/previsoes.pickle')
     this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
     colunas_enviadas = list(this_types.keys())
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',

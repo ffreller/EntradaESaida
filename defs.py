@@ -9,11 +9,13 @@ from sqlalchemy import create_engine
 from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
 from os import path as os_path
 
+
 this_dir = os_path.dirname(os_path.realpath(__file__))
 raw_data_dir = os_path.join(this_dir, 'data/raw')
 interim_data_dir = os_path.join(this_dir,'data/interim')
 final_data_dir = os_path.join(this_dir,'data/final')
 results_dir = os_path.join(this_dir,'results')
+
 
 def my_dateparser(date_str):
     if (type(date_str) == float):
@@ -95,7 +97,7 @@ def print_timeseries_metrics(df, name_of_pred_column, register_results=False, mo
         
 def print_with_time(txt):
     agora = datetime.now()
-    print(f"{agora.strftime('%H:%M:%S')} - {txt}")
+    print(f"{agora.strftime('%d/%m/%Y %H:%M:%S')} - {txt}")
 
 
 def create_db_conn(bd_tns):

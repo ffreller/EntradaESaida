@@ -12,8 +12,10 @@ def preprocess_hospital_data():
     df0['dia_entrada_unidade'] = pd.to_datetime(df0['dt_entrada_unidade'].dt.date)
     df0['dia_saida_unidade'] = pd.to_datetime(df0['dt_saida_unidade'].dt.date)
 
-    assert df0['dia_entrada_unidade'].max() == ontem, print(f"Erro: não há entradas registradas no dia de ontem ({ontem.strftime('%d/%m/%Y')})")
-    assert df0['dia_saida_unidade'].max() == ontem, print(f"Erro: não há saídas registradas no dia de ontem ({ontem.strftime('%d/%m/%Y')})")
+    assert df0['dia_entrada_unidade'].max() >= ontem, \
+        print(f"Erro: não há entradas registradas no dia de ontem ({ontem.strftime('%d/%m/%Y')}). Data máxima: {df0['dia_entrada_unidade'].max()}")
+    assert df0['dia_saida_unidade'].max() >= ontem, \
+        print(f"Erro: não há saídas registradas no dia de ontem ({ontem.strftime('%d/%m/%Y')}). Data máxima: {df0['dia_saida_unidade'].max()}")
     
     # Tirando pacientes eletivos
     df_ = df0.reset_index().copy()
