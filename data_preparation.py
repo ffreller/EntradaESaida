@@ -101,6 +101,64 @@ def preprocess_external_data():
     fim_ano.to_pickle(interim_data_dir+'/fim_ano.pickle')
     after_holidays.to_pickle(interim_data_dir+'/after_holidays.pickle')
     print_with_time('Processamento dos dados externos realizado')
+    
+    
+def preprocess_hospital_data_with_filter(date_filter):
+    df0 = pd.read_pickle(raw_data_dir+'/query_result.pickle')
+
+    # Criando coluna para dia
+    df0['dia_entrada_unidade'] = pd.to_datetime(df0['dt_entrada_unidade'].dt.date)
+    df0['dia_saida_unidade'] = pd.to_datetime(df0['dt_saida_unidade'].dt.date)
+    
+    # Tirando pacientes eletivos
+    df_ = df0.reset_index().copy()
+    first = df_.sort_values('dt_entrada_unidade').groupby('nr_atendimento').first().reset_index()
+    first_eletivo_idxs = first[first['ds_carater_internacao'] == 'Eletivo']['index'].unique()
+    df_entrada = df_.loc[~df_['index'].isin(first_eletivo_idxs)].copy()
+    df_entrada = df_entrada[df0.columns]
+
+    # Separando UI e UTI
+    df_entrada_uti = df_entrada[df_entrada['ds_classific_setor'] == 'UTI'].copy()
+    df_entrada_ui = df_entrada[df_entrada['ds_classific_setor'] == 'Unidades de Internação'].copy()
+    df_saida_uti = df0[df0['ds_classific_setor'] == 'UTI'].copy()
+    df_saida_ui = df0[df0['ds_classific_setor'] == 'Unidades de Internação'].copy()
+            
+    # Agrupando por contagem de linhas por dia
+    df_entrada_uti = df_entrada_uti[['dia_entrada_unidade', 'nr_atendimento']].groupby('dia_entrada_unidade').count().reset_index()
+    df_saida_uti = df_saida_uti[['dia_saida_unidade', 'nr_atendimento']].groupby('dia_saida_unidade').count().reset_index()
+    df_entrada_ui = df_entrada_ui[['dia_entrada_unidade', 'nr_atendimento']].groupby('dia_entrada_unidade').count().reset_index()
+    df_saida_ui = df_saida_ui[['dia_saida_unidade', 'nr_atendimento']].groupby('dia_saida_unidade').count().reset_index()
+
+    # Renomeando as colunas
+    for df_1 in [df_entrada_uti, df_saida_uti, df_entrada_ui, df_saida_ui]:
+        df_1.columns = ["ds", "y"]
+    
+    # Filtrando o dataset para que tenha valores até o dia anterior
+    
+    df_entrada_uti = df_entrada_uti[df_entrada_uti['ds'] < date_filter]
+    df_entrada_ui = df_entrada_ui[df_entrada_ui['ds'] < date_filter]
+    df_saida_uti = df_saida_uti[df_saida_uti['ds'] < date_filter]
+    df_saida_ui = df_saida_ui[df_saida_ui['ds'] < date_filter]
+    
+    #Lidando com dias vazios    
+    for val in df_entrada_ui['ds'].unique():
+        if val not in df_entrada_uti['ds'].unique():
+            df_entrada_uti = df_entrada_uti.append({'ds':val, 'y':0}, ignore_index=True)
+        if val not in df_saida_uti['ds'].unique():
+            df_saida_uti = df_saida_uti.append({'ds':val, 'y':0}, ignore_index=True)
+        if val not in df_saida_ui['ds'].unique():
+            df_saida_ui = df_saida_ui.append({'ds':val, 'y':0}, ignore_index=True)
+    
+    # Resetando o index
+    for df_2 in [df_entrada_uti, df_saida_uti, df_entrada_ui, df_saida_ui]:
+        df_2.reset_index(drop=True, inplace=True)
+        
+    # Salvando arquivos
+    df_entrada_uti.sort_values('ds').to_pickle(interim_data_dir+'/entrada_uti.pickle')
+    df_saida_uti.sort_values('ds').to_pickle(interim_data_dir+'/saida_uti.pickle')
+    df_entrada_ui.sort_values('ds').to_pickle(interim_data_dir+'/entrada_ui.pickle')
+    df_saida_ui.sort_values('ds').to_pickle(interim_data_dir+'/saida_ui.pickle')
+    print_with_time('Processamento dos dados hospitalares realizado')
 
 if __name__ == '__main__':
     preprocess_hospital_data()

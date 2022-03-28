@@ -9,4 +9,4 @@ if __name__ == '__main__':
     os.environ['LD_LIBRARY_PATH'] = instant_client_path
     os.environ['TZ'] = 'America/Sao_Paulo'
     # Run program.py
-    os.execv(sys.executable, [sys.executable] + [this_dir+'/programLoop.py'])
+    os.execv(sys.executable, [sys.executable] + [this_dir+'/program_retroactive.py'])
