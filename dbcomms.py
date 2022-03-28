@@ -85,6 +85,7 @@ def retrieve_data_from_dbprod():
     assert len(df) > 0, print(f'Erro ao baixar dados do DBPROD')
     print_with_time(f'Dados do DB_ODI_PROD baixados')
     df.to_pickle(raw_data_dir+'/query_result.pickle')
+    return True
 
 
 def register_movimentacoes_realizadas_dbteste():

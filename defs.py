@@ -1,4 +1,3 @@
-from math import isnan
 from datetime import datetime
 from base64 import b64decode
 from json import dump as json_dump, load as json_load
@@ -15,18 +14,6 @@ raw_data_dir = os_path.join(this_dir, 'data/raw')
 interim_data_dir = os_path.join(this_dir,'data/interim')
 final_data_dir = os_path.join(this_dir,'data/final')
 results_dir = os_path.join(this_dir,'results')
-
-
-def my_dateparser(date_str):
-    if (type(date_str) == float):
-        if isnan(date_str):
-            return to_datetime('NaT')
-    if len(date_str) == 10:
-        return to_datetime(date_str, format='%d/%m/%Y', errors='coerce')
-    elif len(date_str) < 19:
-        return to_datetime(date_str, format='%d/%m/%Y %H:%M', errors='coerce')
-    else:
-        return to_datetime(date_str, format='%d/%m/%Y %H:%M:%S', errors='coerce')
 
     
 def depois_do_feriado(row):

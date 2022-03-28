@@ -7,7 +7,7 @@ def ExecuteProgramDaily(hour, minute):
         agora = datetime.now()
         if (agora.hour == hour) & (agora.minute <= minute):
             ExecuteProgram()
-        sleep(540)
+        sleep(560)
         
 if __name__ == '__main__':
     ExecuteProgramDaily(6, 10)

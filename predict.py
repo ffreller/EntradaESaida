@@ -50,7 +50,7 @@ def create_predictions():
                 'hrr_previsao', 'qtd_previsao','qtd_previsao_min', 'qtd_previsao_max']].reset_index(drop=True)
     final.loc[final['qtd_previsao_min'] < 0, 'qtd_previsao_min'] = 0
 
-    final.to_pickle(final_data_dir+'todas_previsoes.pickle')
+    final.to_pickle(final_data_dir+'/previsoes.pickle')
     
     todas_preds = pd.read_pickle(final_data_dir+'/todas_previsoes.pickle')
     todas_preds = todas_preds.append(final)
