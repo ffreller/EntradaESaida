@@ -41,13 +41,12 @@ def preprocess_hospital_data():
         df_1.columns = ["ds", "y"]
     
     # Filtrando o dataset para que tenha valores até o dia anterior
-    
     df_entrada_uti = df_entrada_uti[df_entrada_uti['ds'] <= ontem]
     df_entrada_ui = df_entrada_ui[df_entrada_ui['ds'] <= ontem]
     df_saida_uti = df_saida_uti[df_saida_uti['ds'] <= ontem]
     df_saida_ui = df_saida_ui[df_saida_ui['ds'] <= ontem]
     
-    #Lidando com dias vazios    
+    # Lidando com dias vazios    
     for val in df_entrada_ui['ds'].unique():
         if val not in df_entrada_uti['ds'].unique():
             df_entrada_uti = df_entrada_uti.append({'ds':val, 'y':0}, ignore_index=True)
@@ -69,17 +68,22 @@ def preprocess_hospital_data():
     
 
 def preprocess_external_data():
+    # Usando o dataset de entradas para pegar a última data
     df_ = pd.read_pickle(interim_data_dir+'/entrada_ui.pickle')
     last_date = df_['ds'].iloc[-1]
+    
+    # Criando dataset com os próximos 7 dias
     proximos7 = [last_date + pd.Timedelta(i, 'd') for i in range(1,8)]
     df_to_holidays = df_.copy()
     for dia in proximos7:
         df_to_holidays = df_to_holidays.append({'ds':dia, 'y':0}, ignore_index=True)
     
+    # Lendo dataset de feriados em São Paulo
     dateparse = lambda dates: [datetime.strptime(d, '%Y-%m-%d') for d in dates]
     holidays = pd.read_csv(raw_data_dir+'/holidays.csv', parse_dates=['0'], date_parser=dateparse)
     holidays.columns = ['ds']
 
+    # Criando dataset que indica dias depois de feriados
     after_holidays = holidays.copy()
     after_holidays['ds'] = holidays.apply(depois_do_feriado, axis=1)
     after_holidays.dropna(inplace=True)
@@ -88,7 +92,8 @@ def preprocess_external_data():
 
     after_holidays = df_to_holidays.merge(after_holidays, left_on="ds", right_on="ds", how="left").fillna(0)[['ds', 'after_holidays']]
     after_holidays = after_holidays[after_holidays['ds'].duplicated() == False]
-
+    
+    # Criando dataset que indica dias no fim e no começo do ano
     fim_ano = df_to_holidays.copy()
     fim_ano.loc[(fim_ano['ds'].dt.month == 12) & (fim_ano['ds'].dt.day >= 15), 'fim_ano'] = 1
     fim_ano.loc[(fim_ano['ds'].dt.month == 1) & (fim_ano['ds'].dt.day <= 10), 'fim_ano'] = 1
@@ -97,6 +102,7 @@ def preprocess_external_data():
 
     holidays['holiday'] = 'name'
     
+    # Salvadndo arquivos
     holidays.to_pickle(interim_data_dir+'/holidays.pickle')
     fim_ano.to_pickle(interim_data_dir+'/fim_ano.pickle')
     after_holidays.to_pickle(interim_data_dir+'/after_holidays.pickle')
@@ -140,7 +146,7 @@ def preprocess_hospital_data_with_filter(date_filter):
     df_saida_uti = df_saida_uti[df_saida_uti['ds'] < date_filter]
     df_saida_ui = df_saida_ui[df_saida_ui['ds'] < date_filter]
     
-    #Lidando com dias vazios    
+    # Lidando com dias vazios    
     for val in df_entrada_ui['ds'].unique():
         if val not in df_entrada_uti['ds'].unique():
             df_entrada_uti = df_entrada_uti.append({'ds':val, 'y':0}, ignore_index=True)

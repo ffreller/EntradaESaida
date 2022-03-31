@@ -1,0 +1,10 @@
+extrair arquivo rar para pasta EntradaESaida
+conda create -n DartsTimeSeries python=3.7 -y
+conda activate DartsTimeSeries
+pip install -r requirements.txt
+pip install "u8darts[prophet]"
+Colocar em uma cron pra rodar às 6h30 da manhã, todo dia, com o seguinte comando
+bigdata /bigdata/anaconda3/envs/DartsTimeSeries/bin/python caminho/para/EntradaESaida/main.py >> caminho/para/EntradaESaida/log_cron.txt
+
+*No último comando, caminho/para/EntradaESaida se refere à localização da pasta EntradaESaida
+**O nome da pasta pode ser outro, mas se for mudado é necessário mudar o path no último comando

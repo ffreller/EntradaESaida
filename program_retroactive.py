@@ -10,9 +10,9 @@ from pandas import date_range
 def ExecuteProgram():
     print()
     retrieve_data_from_dbprod()
-    days_to_simulate = date_range('2022-03-24',date.today(),freq='d')
+    days_to_simulate = date_range('2022-03-23',date.today(),freq='d')
     for day in days_to_simulate:
-        print_with_time(f'Simulando dia: {day}')
+        print_with_time(f'Simulando dia: {day.strftime("%d/%m/%Y")}')
         preprocess_hospital_data_with_filter(day)
         preprocess_external_data()
         register_movimentacoes_realizadas_dbteste()

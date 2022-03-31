@@ -12,9 +12,12 @@ sqlalchemy_dtypes = {'tipo':sqlalchemy_types.VARCHAR(100),
                      'ds_carater_internacao':sqlalchemy_types.VARCHAR(100),
                      'hrr_realizado': sqlalchemy_types.VARCHAR(100)}
 
-    
+
+# Script para baixar dados de entrada e saída do banco de dados do DB_ODI_PROD
 def retrieve_data_from_dbprod():
+    # Criando conexão com o BD
     conn = create_db_conn('odi')
+    # Query para consultar dados
     query = f"""select cd_estabelecimento,
        nr_atendimento,
        dt_entrada,
@@ -78,22 +81,26 @@ def retrieve_data_from_dbprod():
  order by nr_atendimento, dt_entrada_unidade"""
     try:
         print_with_time(f'Começou a baixar dados do DB_ODI_PROD')
+        #Requisição para baixar os dados
         df = pd.read_sql(query, conn)
     except Exception as e:
         print('Erro ao baixar dados:', e)
         return False
     assert len(df) > 0, print(f'Erro ao baixar dados do DBPROD')
     print_with_time(f'Dados do DB_ODI_PROD baixados')
+    # Salvando
     df.to_pickle(raw_data_dir+'/query_result.pickle')
     return True
 
-
+# Script para registrar entradas e saídas realizadas no DBTESTE1
 def register_movimentacoes_realizadas_dbteste():
+    # Lendo os datasets que serão registrados
     entrada_uti = pd.read_pickle(interim_data_dir+'/entrada_uti.pickle') 
     entrada_ui = pd.read_pickle(interim_data_dir+'/entrada_ui.pickle')
     saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti.pickle')
     saida_ui = pd.read_pickle(interim_data_dir+'/saida_ui.pickle')
     
+    # Adicionando algumas colunas
     agora = datetime.now()
     for df_ in [entrada_uti, entrada_ui, saida_uti, saida_ui]:
         df_['cd_estabelecimento'] = 1
@@ -111,76 +118,38 @@ def register_movimentacoes_realizadas_dbteste():
     entrada_ui['ds_classific_setor'] = 'UI'
     saida_uti['ds_classific_setor'] = 'UTI'
     saida_ui['ds_classific_setor'] = 'UI'
-        
+    
+    # Juntado os datasets
     final = entrada_uti.append([entrada_ui, saida_uti, saida_ui])
+    # Criando conexão com o BD
     conn = create_db_conn('test')
+    # Rodando comando truncate table
     conn.execute(sqlalchemy_text('TRUNCATE TABLE gl_stg_mov_realizado').execution_options(autocommit=True))
     print_with_time('Começou a registrar movimentações realizadas no DBTESTE1')
+    # Enviando os dados
     final.to_sql(name='gl_stg_mov_realizado', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
     print_with_time('Movimentações realizadas registradas no DBTESTE1')
     
 
 def register_predictions_dbteste():
+    # Lendo dataset de previões
     df0 = pd.read_pickle(final_data_dir+'/previsoes.pickle')
+    # Comparando os tipos das colunas
     this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
     colunas_enviadas = list(this_types.keys())
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
                       'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'int64',
                       'qtd_previsao_min': 'int64', 'qtd_previsao_max': 'int64'}
+    # Checando se colunas tês os tipos corretos
     for coluna in correct_types.keys():
         assert coluna in colunas_enviadas, print(f"A coluna '{coluna}' precisa ser enviada para registro no BD")
         assert this_types[coluna] == correct_types[coluna], print(f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}")
+    # Criando conexão com o BD
     conn = create_db_conn('test')
+    # Enviando os dados
     df0.to_sql(name='gl_stg_prev_movimentacao', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
     print_with_time(f"Predições registradas no DBTESTE1")
     
-
-def register_movimentacoes_realizadas_dbprod():
-    entrada_uti = pd.read_pickle(interim_data_dir+'/entrada_uti.pickle') 
-    entrada_ui = pd.read_pickle(interim_data_dir+'/entrada_ui.pickle')
-    saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti.pickle')
-    saida_ui = pd.read_pickle(interim_data_dir+'/saida_ui.pickle')
-    
-    agora = datetime.now()
-    for df_ in [entrada_uti, entrada_ui, saida_uti, saida_ui]:
-        df_['cd_estabelecimento'] = 1
-        df_['dt_carga'] = agora
-        df_['ds_especialidade'] = '-'
-        df_['hrr_realizado'] = '-'
-        df_.rename(columns={'ds':'dt_realizado', 'y':'qtd_realizado'}, inplace=True)
-        
-    entrada_uti['tipo'] = 'Entrada'
-    entrada_ui['tipo'] = 'Entrada'
-    saida_uti['tipo'] = 'Saída'
-    saida_ui['tipo'] = 'Saída'
-    
-    entrada_uti['ds_classific_setor'] = 'UTI'
-    entrada_ui['ds_classific_setor'] = 'UI'
-    saida_uti['ds_classific_setor'] = 'UTI'
-    saida_ui['ds_classific_setor'] = 'UI'
-        
-    final = entrada_uti.append([entrada_ui, saida_uti, saida_ui])
-    conn = create_db_conn('prod')
-    conn.execute(sqlalchemy_text('TRUNCATE TABLE gl_stg_mov_realizado').execution_options(autocommit=True))
-    print_with_time('Começou a registrar movimentações realizadas no HAOC_TASY_PROD')
-    final.to_sql(name='gl_stg_mov_realizado', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
-    print_with_time('Movimentações realizadas registradas no HAOC_TASY_PROD')
-    
-
-def register_predictions_dbprod():
-    df0 = pd.read_pickle(final_data_dir+'/previsoes.pickle')
-    this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
-    colunas_enviadas = list(this_types.keys())
-    correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
-                      'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'int64',
-                      'qtd_previsao_min': 'int64', 'qtd_previsao_max': 'int64'}
-    for coluna in correct_types.keys():
-        assert coluna in colunas_enviadas, print(f"A coluna '{coluna}' precisa ser enviada para registro no BD")
-        assert this_types[coluna] == correct_types[coluna], print(f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}")
-    conn = create_db_conn('prod')
-    df0.to_sql(name='gl_stg_prev_movimentacao', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
-    print_with_time(f"Predições registradas no HAOC_TASY_PROD")
-
     
 if __name__ == '__main__':
     # retrieve_data_from_dbprod()
