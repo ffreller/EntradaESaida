@@ -12,6 +12,13 @@ sqlalchemy_dtypes = {'tipo':sqlalchemy_types.VARCHAR(100),
                      'ds_carater_internacao':sqlalchemy_types.VARCHAR(100),
                      'hrr_realizado': sqlalchemy_types.VARCHAR(100)}
 
+periodos_mapper = {
+    6: '06-12',
+    12: '12-18',
+    18: '18-24',
+    0: '00-06',
+}
+
 
 # Script para baixar dados de entrada e saída do banco de dados do DB_ODI_PROD
 def retrieve_data_from_dbprod():
@@ -121,21 +128,22 @@ def retrieve_data_from_dbprod():
     df.to_pickle(raw_data_dir+'/query_result.pickle')
     return True
 
+
 # Script para registrar entradas e saídas realizadas no DBTESTE1
-def register_movimentacoes_realizadas_dbteste():
+def register_movimentacoes_realizadas_dbteste(table_name='gl_stg_mov_realizado'):
     # Lendo os datasets que serão registrados
-    entrada_uti = pd.read_pickle(interim_data_dir+'/entrada_uti.pickle') 
-    entrada_ui = pd.read_pickle(interim_data_dir+'/entrada_ui.pickle')
-    saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti.pickle')
-    saida_ui = pd.read_pickle(interim_data_dir+'/saida_ui.pickle')
+    entrada_uti = pd.read_pickle(interim_data_dir+'/entrada_uti_horario.pickle') 
+    entrada_ui = pd.read_pickle(interim_data_dir+'/entrada_ui_horario.pickle')
+    saida_uti = pd.read_pickle(interim_data_dir+'/saida_uti_horario.pickle')
+    saida_ui = pd.read_pickle(interim_data_dir+'/saida_ui_horario.pickle')
     
     # Adicionando algumas colunas
     agora = datetime.now()
     for df_ in [entrada_uti, entrada_ui, saida_uti, saida_ui]:
+        df_['hrr_realizado'] = df_['ds'].dt.hour.map(periodos_mapper)
         df_['cd_estabelecimento'] = 1
         df_['dt_carga'] = agora
         df_['ds_especialidade'] = '-'
-        df_['hrr_realizado'] = '-'
         df_.rename(columns={'ds':'dt_realizado', 'y':'qtd_realizado'}, inplace=True)
         
     entrada_uti['tipo'] = 'Entrada'
@@ -153,22 +161,22 @@ def register_movimentacoes_realizadas_dbteste():
     # Criando conexão com o BD
     conn = create_db_conn('test')
     # Rodando comando truncate table
-    conn.execute(sqlalchemy_text('TRUNCATE TABLE gl_stg_mov_realizado').execution_options(autocommit=True))
+    conn.execute(sqlalchemy_text(f'TRUNCATE TABLE {table_name}').execution_options(autocommit=True))
     print_with_time('Começou a registrar movimentações realizadas no DBTESTE1')
     # Enviando os dados
-    final.to_sql(name='gl_stg_mov_realizado', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
+    final.to_sql(name=table_name, con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
     print_with_time('Movimentações realizadas registradas no DBTESTE1')
     
 
-def register_predictions_dbteste():
+def register_predictions_dbteste(table_name='gl_stg_prev_movimentacao'):
     # Lendo dataset de previões
-    df0 = pd.read_pickle(final_data_dir+'/previsoes.pickle')
+    df0 = pd.read_pickle(final_data_dir+'/previsoes_periodos.pickle')
     # Comparando os tipos das colunas
     this_types = df0.dtypes.apply(lambda x: x.name).to_dict()
     colunas_enviadas = list(this_types.keys())
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
-                      'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'int64',
-                      'qtd_previsao_min': 'int64', 'qtd_previsao_max': 'int64'}
+                      'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'float64',
+                      'qtd_previsao_min': 'float64', 'qtd_previsao_max': 'float64'}
     # Checando se colunas têm os tipos corretos
     for coluna in correct_types.keys():
         assert coluna in colunas_enviadas, print(f"A coluna '{coluna}' precisa ser enviada para registro no BD")
@@ -176,9 +184,10 @@ def register_predictions_dbteste():
     # Criando conexão com o BD
     conn = create_db_conn('test')
     # Enviando os dados
-    df0.to_sql(name='gl_stg_prev_movimentacao', con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
+    df0.to_sql(name=table_name, con=conn, if_exists='append', index=False, dtype=sqlalchemy_dtypes, chunksize=1000)
     print_with_time(f"Predições registradas no DBTESTE1")
-    
+
+
     
 if __name__ == '__main__':
     # retrieve_data_from_dbprod()

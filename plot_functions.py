@@ -13,6 +13,18 @@ def plot_per_day(df, name):
     plt.show()
     
     
+def plot_per_period(df, name):
+    plt.style.use('seaborn')
+    plt.figure(figsize=(30,10))
+    scatterplot(data=df, x='ds', y='y', alpha=.4, color="grey", label="valor diário")
+    lineplot(x=df['ds'], y=df['y'].rolling(120).mean(), label="Média movel: 1 mês")
+    lineplot(x=df['ds'], y=df['y'].rolling(28).mean(), label="Média movel: 1 semana", color='goldenrod')
+    # lineplot(x=df['ds'], y=df['y'].rolling(365).mean(), label="Média movel: 1 ano")
+    # lineplot(x=df_covid2['ds'], y=df_covid2['y'],label="Covid")
+    plt.title(name, fontdict={'fontsize':20})
+    plt.show()
+    
+    
 def plot_compare_results(df, column1, column2):
     plt.style.use('seaborn')
     df_ = df[['ds', 'y', column1, column2]].copy()

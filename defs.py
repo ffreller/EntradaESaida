@@ -1,12 +1,22 @@
 from datetime import datetime
 from base64 import b64decode
 from json import dump as json_dump, load as json_load
-from numpy import sqrt, cbrt
-from pandas import to_datetime, Timedelta, DataFrame
-from sklearn.metrics import mean_absolute_percentage_error, mean_absolute_error
+from numpy import sqrt, cbrt, mean, abs
+from pandas import to_datetime, Timedelta, DataFrame, read_pickle
+from sklearn.metrics import mean_absolute_error
 from sqlalchemy import create_engine
 from our_config import usuario_prod, senha_prod, usuario_teste, senha_teste
 from os import path as os_path
+
+
+def my_mape(y_true, y_pred):
+    results = []
+    for (y_true_, y_pred_) in zip(y_true, y_pred):
+        if y_true_ != 0:
+            results.append(abs((y_true_ - y_pred_)/y_true_)*100)
+        else:
+            results.append(100)
+    return mean(results)
 
 
 this_dir = os_path.dirname(os_path.realpath(__file__))
@@ -35,7 +45,7 @@ def print_timeseries_metrics(df, name_of_pred_column, register_results=False, mo
     df_[name_of_pred_column] = df_[name_of_pred_column].round(0).astype(int)
     df_[f'abs_error_{name_of_pred_column}'] = abs(df_['y']-df_[name_of_pred_column])
     df_[f'ape_{name_of_pred_column}'] = df_[f'abs_error_{name_of_pred_column}']/df_['y']
-    this_mape = mean_absolute_percentage_error(df_['y'], df_[name_of_pred_column])
+    this_mape = my_mape(df_['y'], df_[name_of_pred_column])
     this_mae = mean_absolute_error(df_['y'], df_[name_of_pred_column])
     ape90 = df_[f'ape_{name_of_pred_column}'].quantile(0.9)
     ape95 = df_[f'ape_{name_of_pred_column}'].quantile(0.95)
@@ -115,7 +125,8 @@ def get_best_args_for_model(model_name, holidays, covariates_series):
     results = DataFrame(results).T.sort_values(['mae', 'mape'])
     configs, i = {}, 0
     while 'melhor_coluna' not in list(configs.keys()):
-        configs = results.iloc[i]['outros']
+        if 'outros' in list(results.iloc[i].keys()):
+            configs = results.iloc[i]['outros']
         i += 1
     ae90 = results.iloc[i-1]['ae90']
     country_holidays = holidays if configs['holidays'] is True else None
@@ -178,4 +189,14 @@ def create_final_dataset(df_preds, tipo, setor, ae90, especialidade='-'):
     for col in ['qtd_previsao', 'qtd_previsao_min', 'qtd_previsao_max']:
         df_[col] = df_[col].round(0).astype(int)
     return df_
+    
+    
+def my_mape(y_true, y_pred):
+    results = []
+    for (y_true_, y_pred_) in zip(y_true, y_pred):
+        if y_true_ != 0:
+            results.append(abs((y_true_ - y_pred_)/y_true_)*100)
+        else:
+            results.append(0)
+    return mean(results)
     
