@@ -1,16 +1,15 @@
-from dbcomms import register_movimentacoes_realizadas_dbprod, retrieve_data_from_dbprod, register_movimentacoes_realizadas_dbteste, register_predictions_dbteste, \
-    register_movimentacoes_realizadas_dbprod, register_predictions_dbprod
+from dbcomms import retrieve_data_from_dbprod, register_movimentacoes_realizadas_dbteste, register_predictions_dbteste
 from data_preparation import preprocess_hospital_data_with_filter, preprocess_external_data
 from predict import create_predictions
 from defs import print_with_time
 from datetime import date
-from pandas import date_range
+from pandas import date_range, to_datetime
 
     
-def ExecuteProgram():
+def ExecuteProgram(start_date, end_date):
     print()
     retrieve_data_from_dbprod()
-    days_to_simulate = date_range('2022-03-23',date.today(),freq='d')
+    days_to_simulate = date_range(start_date, end_date, freq='d')
     for day in days_to_simulate:
         print_with_time(f'Simulando dia: {day.strftime("%d/%m/%Y")}')
         preprocess_hospital_data_with_filter(day)
@@ -23,5 +22,11 @@ def ExecuteProgram():
 
     
 if __name__ == '__main__':
-    ExecuteProgram()
+    dia_str = '01/03/2022'
+    this_start_date = to_datetime(dia_str, format="%d/%m/%Y")
+    this_end_date = date.today()
+    print('*'*100)
+    print(f'Simulando de {dia_str} até {this_end_date.strftime("%d/%m/%Y")}')
+    print('*'*100)
+    ExecuteProgram(this_start_date, this_end_date)
     

@@ -26,7 +26,9 @@ def retrieve_data_from_dbprod():
        ds_carater_internacao,
        dt_entrada_unidade,
        dt_saida_unidade,
-       ds_classific_setor
+       ds_classific_setor,
+       ds_atend_especialidade ds_especialidade,
+       sysdate                dt_carga
   from (select cd_estabelecimento,
                nr_atendimento,
                dt_entrada_atend dt_entrada,
@@ -35,40 +37,66 @@ def retrieve_data_from_dbprod():
                ds_carater_internacao_atend ds_carater_internacao,
                FIRST_VALUE(dt_entrada_unidade_dd) OVER(PARTITION BY nr_atendimento, ordem ORDER BY dt_entrada_unidade_dd asc NULLS FIRST) dt_entrada_unidade,
                FIRST_VALUE(dt_saida_unidade_dd) OVER(PARTITION BY nr_atendimento, ordem ORDER BY dt_saida_unidade_dd desc NULLS FIRST) dt_saida_unidade,
-               ds_classific_setor
-          from (select dat.cd_estabelecimento,
-                       dat.nr_atendimento,
-                       dat.dt_entrada_atend,
-                       dat.dt_alta_atend,
-                       dat.ds_tipo_atendimento,
-                       dat.ds_carater_internacao_atend,
-                       fme.dt_entrada_unidade_dd,
-                       fme.dt_saida_unidade_dd,
-                       dsa.cd_setor_atendimento,
-                       dsa.ds_setor_atendimento,
-                       dsa.ds_classific_setor,
-                       rank() over(partition by dat.nr_atendimento order by fme.dt_entrada_unidade_dd) - rank() over(partition by dat.nr_atendimento, dsa.ds_classific_setor order by fme.dt_entrada_unidade_dd) ordem
-                  from dw.fato_paciente_dia fme,
-                       dw.dim_setor_atend   dsa,
-                       dw.dim_atendimento   dat
-                 where 1 = 1
-                   and dat.cd_estabelecimento = 1
-                   and fme.sksetoratendimento = dsa.sksetoratendimento
-                   and fme.skatendimento = dat.skatendimento
-                   and trunc(dat.dt_entrada_atend, 'mm') >=
-                       to_date('01/01/2017', 'dd/mm/rrrr')
-                --and dat.nr_atendimento = 3092291
-                 group by dat.cd_estabelecimento,
-                          dat.nr_atendimento,
-                          dat.dt_entrada_atend,
-                          dat.dt_alta_atend,
-                          dat.ds_tipo_atendimento,
-                          dat.ds_carater_internacao_atend,
-                          fme.dt_entrada_unidade_dd,
-                          fme.dt_saida_unidade_dd,
-                          dsa.cd_setor_atendimento,
-                          dsa.ds_setor_atendimento,
-                          dsa.ds_classific_setor))
+               ds_classific_setor,
+               ds_atend_especialidade
+          from (select a.cd_estabelecimento,
+                       a.nr_atendimento,
+                       a.dt_entrada_atend,
+                       a.dt_alta_atend,
+                       a.ds_tipo_atendimento,
+                       a.ds_carater_internacao_atend,
+                       a.dt_entrada_unidade_dd,
+                       a.dt_saida_unidade_dd,
+                       a.cd_setor_atendimento,
+                       a.ds_setor_atendimento,
+                       a.ds_atend_especialidade,
+                       a.ds_classific_setor,
+                       sum(a.valor) over(partition by a.nr_atendimento order by a.dt_entrada_unidade_dd, a.dt_saida_unidade_dd desc nulls last) ordem
+                  from (select dat.cd_estabelecimento,
+                               dat.nr_atendimento,
+                               dat.dt_entrada_atend,
+                               dat.dt_alta_atend,
+                               dat.ds_tipo_atendimento,
+                               dat.ds_carater_internacao_atend,
+                               fme.dt_entrada_unidade_dd,
+                               fme.dt_saida_unidade_dd,
+                               dsa.cd_setor_atendimento,
+                               dsa.ds_setor_atendimento,
+                               dat.ds_atend_especialidade,
+                               dsa.ds_classific_setor,
+                               case
+                                 when dsa.ds_classific_setor =
+                                      LAG(dsa.ds_classific_setor, 1, '#')
+                                  OVER(partition by dat.nr_atendimento
+                                           ORDER BY fme.dt_entrada_unidade_dd,
+                                           fme.dt_saida_unidade_dd desc nulls last) then
+                                  0
+                                 else
+                                  1
+                               end valor
+                          from dw.fato_paciente_dia fme,
+                               dw.dim_setor_atend   dsa,
+                               dw.dim_atendimento   dat
+                         where 1 = 1
+                           and dat.cd_estabelecimento = 1
+                           and fme.sksetoratendimento = dsa.sksetoratendimento
+                           and fme.skatendimento = dat.skatendimento
+						   and dsa.cd_setor_atendimento <> 537
+                           and trunc(dat.dt_entrada_atend, 'mm') >=
+                               to_date('01/01/2017', 'dd/mm/rrrr')
+                         group by dat.cd_estabelecimento,
+                                  dat.nr_atendimento,
+                                  dat.dt_entrada_atend,
+                                  dat.dt_alta_atend,
+                                  dat.ds_tipo_atendimento,
+                                  dat.ds_carater_internacao_atend,
+                                  fme.dt_entrada_unidade_dd,
+                                  fme.dt_saida_unidade_dd,
+                                  dsa.cd_setor_atendimento,
+                                  dsa.ds_setor_atendimento,
+                                  dsa.ds_classific_setor,
+                                  dat.ds_atend_especialidade) a))
+ where 1 = 1
  group by cd_estabelecimento,
           nr_atendimento,
           dt_entrada,
@@ -77,7 +105,8 @@ def retrieve_data_from_dbprod():
           ds_carater_internacao,
           dt_entrada_unidade,
           dt_saida_unidade,
-          ds_classific_setor
+          ds_classific_setor,
+          ds_atend_especialidade
  order by nr_atendimento, dt_entrada_unidade"""
     try:
         print_with_time(f'Começou a baixar dados do DB_ODI_PROD')
@@ -140,7 +169,7 @@ def register_predictions_dbteste():
     correct_types = {'cd_estabelecimento': 'int64', 'dt_carga': 'datetime64[ns]', 'tipo': 'object', 'ds_classific_setor': 'object',
                       'ds_especialidade': 'object', 'dt_previsao': 'datetime64[ns]', 'hrr_previsao': 'object', 'qtd_previsao': 'int64',
                       'qtd_previsao_min': 'int64', 'qtd_previsao_max': 'int64'}
-    # Checando se colunas tês os tipos corretos
+    # Checando se colunas têm os tipos corretos
     for coluna in correct_types.keys():
         assert coluna in colunas_enviadas, print(f"A coluna '{coluna}' precisa ser enviada para registro no BD")
         assert this_types[coluna] == correct_types[coluna], print(f"A coluna '{coluna}' é do tipo {this_types[coluna]}, mas deveria ser {correct_types[coluna]}")

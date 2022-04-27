@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 
 def preprocess_hospital_data():
-    ontem = pd.to_datetime(datetime.today().date()) - pd.Timedelta(days=1)
+    ontem = datetime.today().date() - pd.Timedelta(days=1)
     df0 = pd.read_pickle(raw_data_dir+'/query_result.pickle')
 
     # Criando coluna para dia
@@ -29,7 +29,7 @@ def preprocess_hospital_data():
     df_entrada_ui = df_entrada[df_entrada['ds_classific_setor'] == 'Unidades de Internação'].copy()
     df_saida_uti = df0[df0['ds_classific_setor'] == 'UTI'].copy()
     df_saida_ui = df0[df0['ds_classific_setor'] == 'Unidades de Internação'].copy()
-            
+
     # Agrupando por contagem de linhas por dia
     df_entrada_uti = df_entrada_uti[['dia_entrada_unidade', 'nr_atendimento']].groupby('dia_entrada_unidade').count().reset_index()
     df_saida_uti = df_saida_uti[['dia_saida_unidade', 'nr_atendimento']].groupby('dia_saida_unidade').count().reset_index()
