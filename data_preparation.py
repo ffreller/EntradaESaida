@@ -82,21 +82,24 @@ def preprocess_hospital_data(dia_max:datetime=None):
     
 
 def preprocess_external_data():
+    # Usando o dataset de entradas para pegar a última data
     df_ = pd.read_pickle(interim_data_dir+'/entrada_ui_dia.pickle')
     last_date = pd.to_datetime(df_['ds'].iloc[-1].date())
     proximos7 = [last_date + pd.Timedelta(i, 'd') for i in range(1,8)]
     
+    # Criando dataset com os próximos 7 dias
     df_to_holidays = df_.copy()
     for dia in proximos7:
         df_to_holidays = df_to_holidays.append({'ds':dia, 'y':0}, ignore_index=True)
         
-
+    # Lendo dataset de feriados em São Paulo
     dateparser = lambda dates: [datetime.strptime(d, '%Y-%m-%d') for d in dates]
     holidays = pd.read_csv(raw_data_dir+'/holidays.csv', parse_dates=['0'], date_parser=dateparser)
     holidays.columns = ['ds']
     holidays = df_to_holidays.merge(holidays, how='left', on='ds', suffixes=('', '_y'))
     holidays.drop(['y'], axis=1, inplace=True)
 
+    # Criando dataset que indica dias depois de feriados
     after_holidays = holidays.copy()
     after_holidays['ds'] = holidays.apply(depois_do_feriado, axis=1)
     after_holidays.dropna(inplace=True)
@@ -105,6 +108,8 @@ def preprocess_external_data():
 
     after_holidays = df_to_holidays.merge(after_holidays, on='ds', how="left", suffixes=('', '_y')).fillna(0)
     after_holidays = after_holidays[after_holidays['ds'].duplicated() == False]
+    
+    # Criando dataset que indica dias no fim e no começo do ano
     fim_ano = df_to_holidays.copy()
     fim_ano.loc[(fim_ano['ds'].dt.month == 12) & (fim_ano['ds'].dt.day >= 15), 'fim_ano'] = 1
     fim_ano.loc[(fim_ano['ds'].dt.month == 1) & (fim_ano['ds'].dt.day <= 10), 'fim_ano'] = 1
@@ -113,6 +118,7 @@ def preprocess_external_data():
 
     holidays['holiday'] = 'name'
     
+    # Salvando arquivos
     holidays.sort_values('ds', inplace=True)
     fim_ano = fim_ano[['ds', 'fim_ano']].sort_values('ds').copy()
     after_holidays = after_holidays[['ds', 'after_holidays']].sort_values('ds').copy()
