@@ -13,13 +13,13 @@ def ExecuteProgram():
         # Processar dados externos
         preprocess_external_data()
         # Registrar movimentações de entrada e saída no DBTESTE1
-        register_movimentacoes_realizadas_dbteste('bkp_gl_stg_mov_realizado_0425')
+        register_movimentacoes_realizadas_dbteste()
         # Criar as predições
         create_predictions()
         # Fazer os cálculos de períodos
         daily_prediction_to_period_prediction()
         # Regitrar previsões no DBTESTE1
-        register_predictions_dbteste('bkp_gl_stg_prev_movimenta_0425')
+        register_predictions_dbteste()
         print_with_time('Fim. Sucesso ao executar script')
 
     
