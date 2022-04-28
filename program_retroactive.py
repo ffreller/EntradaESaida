@@ -11,7 +11,7 @@ def ExecuteProgram(start_date, end_date):
     retrieve_data_from_dbprod()
     days_to_simulate = date_range(start_date, end_date, freq='d')
     for day in days_to_simulate:
-        print('\nSimulando dia,', day.strftime("%d/%m/%Y"))
+        print('\nSimulando dia', day.strftime("%d/%m/%Y"))
         preprocess_hospital_data(day)
         preprocess_external_data()
         register_movimentacoes_realizadas_dbteste('bkp_gl_stg_mov_realizado_0425')

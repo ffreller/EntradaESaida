@@ -9,7 +9,7 @@ def preprocess_hospital_data(dia_max:datetime=None):
     else:
         dia = pd.to_datetime(datetime.today().date()) #Hoje
         
-    dia -= - pd.Timedelta(1, 'd')
+    dia -= pd.Timedelta(1, 'd')
     df0 = pd.read_pickle(raw_data_dir+'/query_result.pickle')
     
     assert df0['dt_entrada_unidade'].max() >= dia, \
