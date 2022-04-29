@@ -14,10 +14,10 @@ def ExecuteProgram(start_date, end_date):
         print('\nSimulando dia', day.strftime("%d/%m/%Y"))
         preprocess_hospital_data(day)
         preprocess_external_data()
-        register_movimentacoes_realizadas_dbteste('bkp_gl_stg_mov_realizado_0425')
+        register_movimentacoes_realizadas_dbteste()
         create_predictions()
         daily_prediction_to_period_prediction()
-        register_predictions_dbteste('bkp_gl_stg_prev_movimenta_0425')
+        register_predictions_dbteste()
         print_with_time('Fim. Sucesso ao executar script')
         print()
 

@@ -9,12 +9,11 @@ def preprocess_hospital_data(dia_max:datetime=None):
     else:
         dia = pd.to_datetime(datetime.today().date()) #Hoje
         
-    dia -= pd.Timedelta(1, 'd')
     df0 = pd.read_pickle(raw_data_dir+'/query_result.pickle')
     
-    assert df0['dt_entrada_unidade'].max() >= dia, \
+    assert df0['dt_entrada_unidade'].max() >= dia - pd.Timedelta(1, 'd'), \
         print(f"Erro: não há entradas registradas no dia de ontem ({dia.strftime('%d/%m/%Y')}). Data máxima: {df0['dt_entrada_unidade'].max()}")
-    assert df0['dt_saida_unidade'].max() >= dia, \
+    assert df0['dt_saida_unidade'].max() >= dia - pd.Timedelta(1, 'd'), \
         print(f"Erro: não há saídas registradas no dia de ontem ({dia.strftime('%d/%m/%Y')}). Data máxima: {df0['dt_saida_unidade'].max()}")
     
     # Tirando pacientes eletivos
@@ -53,11 +52,11 @@ def preprocess_hospital_data(dia_max:datetime=None):
             df_1.columns = ["ds", "y"]
             
 
-        # Filtrando o dataset para que tenha valores até o dia anterior
-        df_entrada_uti = df_entrada_uti[df_entrada_uti['ds'] <= dia]
-        df_entrada_ui = df_entrada_ui[df_entrada_ui['ds'] <= dia]
-        df_saida_uti = df_saida_uti[df_saida_uti['ds'] <= dia]
-        df_saida_ui = df_saida_ui[df_saida_ui['ds'] <= dia]
+        # Filtrando o dataset para que não tenha valores relativos ao dia de hoje
+        df_entrada_uti = df_entrada_uti[df_entrada_uti['ds'] < dia]
+        df_entrada_ui = df_entrada_ui[df_entrada_ui['ds'] < dia]
+        df_saida_uti = df_saida_uti[df_saida_uti['ds'] < dia]
+        df_saida_ui = df_saida_ui[df_saida_ui['ds'] < dia]
         
         #Lidando com dias vazios    
         for val in df_entrada_ui['ds'].unique():
